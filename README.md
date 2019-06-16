@@ -1,5 +1,5 @@
 # todo-vue
-This project a simple Todo app with [Vue.js], [Vuex] and [Vuetify] technologies.
+This project a simple Todo app with [Vue.js], [Vuex] and [Vuetify] technologies. [Live Demo](https://lucid-benz-dba7ff.netlify.com)
 
 [Vue.js]: https://vuejs.org
 [Vuex]: https://vuex.vuejs.org
