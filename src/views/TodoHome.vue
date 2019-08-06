@@ -1,17 +1,17 @@
 <template>
   <v-layout row wrap>
     <v-flex text-xs-center>
-      <h1 class="primary--text display-4 font-weight-regular h1">todos</h1>
+      <h1 class="blue--text text--lighten-1 display-4 font-weight-regular">todos</h1>
       <v-card>
         <v-list-tile>
           <v-list-tile-action>
             <v-checkbox
               v-if="todos.length > 0"
               @change="toggleAll" 
-              color="primary"
+              color="blue lighten-1"
             ></v-checkbox>
             <v-icon
-              color="primary"
+              color="blue lighten-1"
               v-else
             >check</v-icon>
           </v-list-tile-action>
@@ -27,28 +27,25 @@
             @keyup.enter="addTodo"
           ></v-text-field>
         </v-list-tile>
-        <v-card-actions>
-          <span>Remaining: {{remaining}}</span>
+        <v-divider></v-divider>
+        <v-card-actions v-if="todos.length > 0">
+          <v-card-title class="pa-0 pl-2 blue--text text--lighten-1 body-2">
+            {{remaining}} {{remaining | pluralize('item')}} left
+          </v-card-title>
           <v-spacer></v-spacer>
           <v-btn-toggle 
-            mandatory 
-            class="elevation-0" 
+            mandatory
+            class="elevation-0"
             flat
           >
-            <v-btn :disabled="todos.length === 0" small flat @click="updateFilter('all')">all</v-btn>
-            <v-btn :disabled="todos.length === 0" small flat @click="updateFilter('done')">done</v-btn>
-            <v-btn :disabled="todos.length === 0" small flat @click="updateFilter('active')">active</v-btn>
+            <v-btn :disabled="todos.length === 0" color="blue lighten-1" small flat @click="updateFilter('all')">all</v-btn>
+            <v-btn :disabled="todos.length === 0" color="blue lighten-1" small flat @click="updateFilter('done')">done</v-btn>
+            <v-btn :disabled="todos.length === 0" color="blue lighten-1" small flat @click="updateFilter('active')">active</v-btn>
           </v-btn-toggle>
-          <v-spacer></v-spacer>
-          <v-btn 
-            small
-            color="red" 
-            flat 
-            :disabled="todos.length === remaining"
-            @click="clearCompleted"
-          >Clear completed</v-btn>
         </v-card-actions>
-        <v-list>
+        <v-slide-y-transition
+          group
+        >
           <template v-for="todo in todosFilter">
             <v-divider :key="`${todo.id}-divider`"></v-divider>
             <TodoItem 
@@ -57,8 +54,16 @@
               :toggleAll="!anyRemaining"
             />
           </template>
-        </v-list>
+        </v-slide-y-transition>
       </v-card>
+      <v-btn 
+          block
+          color="red lighten-2"
+          dark
+          class="body-2"
+          :disabled="todos.length === remaining"
+          @click="clearCompleted"
+        >Clear completed</v-btn>
     </v-flex>
   </v-layout>
 </template>
@@ -76,11 +81,14 @@ export default {
 
   data: () => ({
     newTodo: "",
-    idNewTodo: 3
   }),
 
   computed: {
     ...mapGetters(['todos', 'remaining', 'anyRemaining', 'todosFilter'])
+  },
+
+  filters: {
+    pluralize: (number, word) => number === 1 ? word : (word + 's') 
   },
 
   methods: {
@@ -90,33 +98,21 @@ export default {
       }
 
       this.$store.dispatch('addTodo', {
-        id: this.idNewTodo,
+        id: Date.now(),
         title: this.newTodo
-      });
+      })
 
       this.newTodo = ""
-      this.idNewTodo++
-      console.log(this.remaining)
     },
-
     toggleAll() {
       this.$store.dispatch('toggleAll', this.anyRemaining)
     },
-
     updateFilter(filter) {
       this.$store.dispatch('updateFilter', filter)
     },
-
     clearCompleted() {
       this.$store.dispatch('clearCompleted')
     }
   }
 }
 </script>
-
-<style>
-h1 {
-  opacity: .7;
-}
-</style>
-

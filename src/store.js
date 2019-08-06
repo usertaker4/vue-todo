@@ -3,33 +3,28 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+const STORAGE_KEY = 'todos-vuetify'
+const todoStorage = {
+  fetch: function () {
+    const todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+
+    return todos
+  },
+  save: function (todos) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
+  }
+}
+
 export default new Vuex.Store({
   state: {
-    todos: [
-      {
-        id: 1,
-        title: 'Learn JS',
-        done: false,
-        editing: false
-      },
-      {
-        id: 2,
-        title: 'Have lunch',
-        done: false,
-        editing: false
-      }
-    ],
-    
+    todos: todoStorage.fetch(),
     filter: 'all'
   },
 
   getters: {
     todos: state => state.todos,
-
     remaining: state => state.todos.filter(item => !item.done).length,
-
     anyRemaining: (state, getters) => getters.remaining !== 0,
-
     todosFilter: (state) => {
       if (state.filter == 'all') {
         return state.todos
@@ -50,12 +45,10 @@ export default new Vuex.Store({
         editing: false
       })
     },
-
     removeTodo: (state, id) => {
       const index = state.todos.findIndex(item => item.id === id)
       state.todos.splice(index, 1)
     },
-
     updateTodo: (state, todo) => {
       const index = state.todos.findIndex(item => item.id === todo.id)
       state.todos.splice(index, 1, {
@@ -65,40 +58,39 @@ export default new Vuex.Store({
         editing: todo.editing
       })
     },
-
     toggleAll: (state, value) => {
       state.todos.forEach(item => (item.done = value))
     },
-
     updateFilter: (state, filter) => {
       state.filter = filter
     },
-
     clearCompleted: state => state.todos = state.todos.filter(item => !item.done)
   },
+
   actions: {
     addTodo({commit}, todo) {
       commit('addTodo', todo)
     },
-
     removeTodo({commit}, id) {
       commit('removeTodo', id)
     },
-
     updateTodo({commit}, todo) {
       commit('updateTodo', todo)
     },
-
     toggleAll({commit}, value) {
       commit('toggleAll', value)
     },
-
     updateFilter({commit}, filter) {
       commit('updateFilter', filter)
     },
-
     clearCompleted({commit}) {
       commit('clearCompleted')
     }
-  }
+  },
+
+  plugins: [store => {
+    store.subscribe((mutation, {todos}) => {
+      todoStorage.save(todos)
+    })
+  }]
 })

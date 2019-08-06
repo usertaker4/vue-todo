@@ -3,23 +3,23 @@
     <v-list-tile-action>
       <v-checkbox
         v-model="done"
-        color="primary"
+        color="blue lighten-2"
         @change="doneEdit"
       ></v-checkbox>
     </v-list-tile-action>
     <template v-if="!editing">
       <v-list-tile-content
-        :class="{'primary--text': done}"
+        :class="{'blue--text text--lighten-2': done}"
         @dblclick="editTodo(todo)"
       >
-        {{title}}
+        <v-list-tile-title>{{title}}</v-list-tile-title>
       </v-list-tile-content>
 
       <v-list-tile-action>
         <v-btn
           flat
           icon
-          color="red"
+          color="red lighten-2"
           @click="removeTodo(todo.id)"
         >
           <v-icon>close</v-icon>
@@ -75,12 +75,10 @@ export default {
     removeTodo(id) {
       this.$store.dispatch('removeTodo', id)
     },
-
     editTodo() {
       this.beforeEditValue = this.title
       this.editing = true
     },
-
     doneEdit() {
       if (this.title.trim() === '') {
         this.title = this.beforeEditValue
@@ -93,7 +91,6 @@ export default {
         editing: this.editing
       })
     },
-
     cancelEdit() {
       this.title = this.beforeEditValue
       this.editing = false
